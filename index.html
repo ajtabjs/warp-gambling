@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warp+ Key Generator</title>
+    <link rel="stylesheet" href="alt.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Warp+ Key Generator</h1>
+    
+    <div id="output">
+        <h2 id="generatedKey">Something went wrong... try refreshing?</h2>
+        <h2 id="dataInfo"></h2>
+        <h3>Credits to zerofive (zrfv), vix (eepyrom), and rentry.co/WarpPlusKeys for supplying keys :3</h3>
+        <h4>Site made by ThatOnePerson and ajtabs</h4>
+        <h4>Some keys may not work, just take a new one if it doesn't.</h4>
+    </div>
+
+    <script type="module">
+        async function fetchKeys(filePath) {
+            try {
+                const response = await fetch(filePath);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
+                }
+
+                const content = await response.text();
+                const lines = content.trim().split('\n');
+
+                return lines.map(line => {
+                    const [key, data] = line.split('|');
+                    return { key: key.trim(), data: data ? data.trim() : '' };
+                });
+            } catch (error) {
+                console.error('Error fetching file:', error);
+                return [];
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const filePaths = [
+                'keys/150k_warp_plus_keys.txt',
+                'keys/WARPKeys_zrfv.txt',
+                'keys/rentry.txt'
+            ];
+
+            const generatedKeyElement = document.getElementById('generatedKey');
+            const dataInfo = document.getElementById('dataInfo');
+
+            let allKeys = [];
+
+            // Fetch keys from all files and combine into one array
+            for (const filePath of filePaths) {
+                const keyData = await fetchKeys(filePath);
+                allKeys = allKeys.concat(keyData);
+            }
+
+            if (allKeys.length > 0) {
+                // Select a random key from the combined array
+                const randomIndex = Math.floor(Math.random() * allKeys.length);
+                const { key, data } = allKeys[randomIndex];
+
+                // Display the random key
+                generatedKeyElement.textContent = key;
+
+                // Display the actual data
+                dataInfo.textContent = `This key has ${data} of data.`;
+            } else {
+                generatedKeyElement.textContent = 'No keys found.';
+                dataInfo.textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
